@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistente de Vendas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Assistente de Quebra de Objeções</h1>
+        <p>Digite ou cole a objeção do cliente abaixo e clique em "Gerar Roteiro".</p>
+        
+        <textarea id="objection-input" placeholder="Ex: 'Achei o valor um pouco alto...'"></textarea>
+        <button id="submit-button">Gerar Roteiro</button>
+
+        <div id="loading-spinner" class="hidden"></div>
+        
+        <div id="response-area">
+            </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
