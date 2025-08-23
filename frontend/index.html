@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assistente de Vendas</title>
+    <title>CloserPro - Quebra de objecoes</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Assistente de Quebra de Objeções</h1>
-        <p>Digite ou cole a objeção do cliente abaixo e clique em "Gerar Roteiro".</p>
+        <h1>CloserPro</h1>
+        <p class="subtitulo">Receba roteiros inteligentes para contornar objeções em segundos.</p>
         
-        <textarea id="objection-input" placeholder="Ex: 'Achei o valor um pouco alto...'"></textarea>
-        <button id="submit-button">Gerar Roteiro</button>
+        <textarea id="objection-input" placeholder="Ex: 'Vou pensar um pouco e depois te retorno...'"></textarea>
+        
+        <button id="submit-button">
+            <i class="ph ph-magic-wand"></i>
+            <span>Quebrar Objeção</span>
+        </button>
 
         <div id="loading-spinner" class="hidden"></div>
-        
-        <div id="response-area">
-            </div>
+        <div id="response-area"></div>
     </div>
 
     <script src="script.js"></script>

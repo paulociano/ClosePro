@@ -1,81 +1,180 @@
-/* frontend/style.css */
+/* Importa a fonte 'Inter' do Google Fonts para um visual mais moderno */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+/* Define variáveis globais para cores e estilos, facilitando a manutenção */
+:root {
+    --cor-primaria: #0052cc; /* Azul profissional */
+    --cor-primaria-hover: #0041a3;
+    --cor-fundo: #f8f9fa; /* Fundo suave, quase branco */
+    --cor-superficie: #ffffff; /* Cor dos cards e container */
+    --cor-texto-principal: #212529; /* Preto suave para leitura */
+    --cor-texto-secundario: #6c757d; /* Cinza para textos de apoio */
+    --sombra: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --raio-borda: 8px;
+}
+
+/* Estilos base para o corpo da página */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f7f9;
-    color: #333;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto-principal);
     margin: 0;
     padding: 20px;
+    -webkit-font-smoothing: antialiased; /* Melhora a renderização da fonte */
+    -moz-osx-font-smoothing: grayscale;
 }
 
+/* Container principal da aplicação */
 .container {
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 700px;
+    margin: 2rem auto; /* Espaçamento vertical e centralização horizontal */
+    background-color: var(--cor-superficie);
+    padding: 40px;
+    border-radius: var(--raio-borda);
+    box-shadow: var(--sombra);
 }
 
+/* Título principal */
 h1 {
-    color: #1a2b4d;
+    color: var(--cor-texto-principal);
     text-align: center;
+    margin-bottom: 0.5rem;
 }
 
+/* Subtítulo de apoio */
+.subtitulo {
+    text-align: center;
+    color: var(--cor-texto-secundario);
+    margin-bottom: 2rem;
+}
+
+/* Área de texto para inserção da objeção */
 textarea {
     width: 100%;
-    height: 100px;
-    padding: 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+    height: 120px;
+    padding: 15px;
+    border-radius: var(--raio-borda);
+    border: 1px solid #ced4da;
     font-size: 16px;
+    font-family: 'Inter', sans-serif;
     margin-top: 10px;
-    box-sizing: border-box;
+    box-sizing: border-box; /* Garante que padding não afete a largura total */
+    resize: vertical; /* Permite redimensionamento apenas vertical */
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+/* Efeito de foco na área de texto */
+textarea:focus {
+    outline: none;
+    border-color: var(--cor-primaria);
+    box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.2);
+}
+
+/* Botão principal de ação */
 button {
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Espaço entre o ícone e o texto */
     width: 100%;
     padding: 15px;
-    background-color: #007bff;
+    background-color: var(--cor-primaria);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--raio-borda);
     font-size: 18px;
+    font-weight: 500;
     cursor: pointer;
     margin-top: 15px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.1s;
 }
 
+/* Efeito ao passar o mouse sobre o botão */
 button:hover {
-    background-color: #0056b3;
+    background-color: var(--cor-primaria-hover);
+    transform: translateY(-2px);
 }
 
-#response-area {
-    margin-top: 30px;
-    border-top: 1px solid #eee;
-    padding-top: 20px;
+/* Estilo do botão quando desabilitado (durante o loading) */
+button:disabled {
+    background-color: #a9c7e8;
+    cursor: not-allowed;
+    transform: translateY(0);
 }
 
-#response-area h3 {
-    color: #1a2b4d;
-}
-
-/* Spinner de Loading */
+/* Spinner de Carregamento */
 #loading-spinner {
     border: 5px solid #f3f3f3;
     border-top: 5px solid #3498db;
     border-radius: 50%;
     width: 40px;
     height: 40px;
-    animation: spin 1s linear infinite;
     margin: 20px auto;
+    animation: spin 1s linear infinite;
 }
 
+/* Animação de rotação para o spinner */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
+/* Classe para animação de ícones de carregamento */
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Classe para esconder elementos */
 .hidden {
     display: none;
+}
+
+/* Área onde a resposta da IA é exibida */
+#response-area {
+    margin-top: 30px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+/* Estilo dos cards de resposta */
+.response-card {
+    background-color: var(--cor-fundo);
+    border: 1px solid #e9ecef;
+    border-radius: var(--raio-borda);
+    margin-top: 1.5rem;
+    padding: 20px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Título de cada card de resposta */
+.response-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    color: var(--cor-primaria);
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+/* Estilos para listas e parágrafos dentro dos cards */
+.response-card ul, .response-card p {
+    line-height: 1.6;
+    color: var(--cor-texto-principal);
+}
+
+.response-card ul {
+    padding-left: 20px;
+}
+
+/* Animação de surgimento suave para os cards */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

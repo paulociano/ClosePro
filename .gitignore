@@ -1,0 +1,9 @@
+# Arquivo de chaves de API e segredos
+.env
+
+# Pasta do ambiente virtual do Python
+venv/
+__pycache__/
+
+# Arquivos de sistema operacional
+.DS_Store
