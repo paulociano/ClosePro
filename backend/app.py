@@ -20,7 +20,7 @@ except ValueError as erro:
     print(f"Erro Crítico na Configuração: {erro}")
     exit()
 
-# --- Carregamento do Playbook de Vendas ---
+# --- Carregamento dos Playbooks e Cases ---
 try:
     with open("playbook.txt", "r", encoding="utf-8") as arquivo_playbook:
         playbook_estrategias = arquivo_playbook.read()
@@ -28,6 +28,15 @@ try:
 except FileNotFoundError:
     print("Erro Crítico: O arquivo 'playbook.txt' não foi encontrado.")
     playbook_estrategias = "Nenhuma estratégia de playbook foi carregada."
+
+try:
+    with open("cases.txt", "r", encoding="utf-8") as arquivo_cases:
+        cases_de_sucesso = arquivo_cases.read()
+    print("Cases de sucesso carregados com sucesso.")
+except FileNotFoundError:
+    print("Aviso: O arquivo 'cases.txt' não foi encontrado. A IA não usará exemplos.")
+    cases_de_sucesso = "Nenhum case de sucesso disponível."
+
 
 # --- Inicialização do Servidor Web Flask ---
 aplicacao = Flask(__name__)
@@ -67,7 +76,7 @@ def transcrever_audio():
         print(f"Ocorreu um erro na transcrição: {erro}")
         return jsonify({"error": "Não foi possível processar o arquivo de áudio."}), 500
 
-# --- ROTA 2: GERAÇÃO DE ROTEIRO A PARTIR DE TEXTO ---
+# --- ROTA 2: GERAÇÃO DE ROTEIRO ---
 @aplicacao.route('/api/get-response', methods=['POST'])
 def obter_resposta_da_ia():
     try:
@@ -80,14 +89,17 @@ def obter_resposta_da_ia():
         if not texto_da_objecao.strip():
             return jsonify({"error": "Nenhuma objeção foi fornecida"}), 400
 
-        print(f"Objeção: '{texto_da_objecao}', Valor: R$ {valor_consultoria}, Vantagens: '{vantagens_percebidas}', Perfil DISC: {perfil_disc}")
+        print(f"Objeção: '{texto_da_objecao}', Perfil DISC: {perfil_disc}")
 
         prompt_para_ia = f"""
         ### CONTEXTO ###
-        Você é um líder da W1 Consultoria Financeira, especialista em treinar consultores financeiros e mestre na metodologia DISC. Sua missão é criar um roteiro eficaz para contornar uma objeção de fechamento de proposta de consultoria.
+        Você é um líder da W1 Consultoria Financeira, especialista em treinar consultores financeiros e mestre na metodologia DISC. Sua missão é criar um roteiro completo para contornar uma objeção.
 
         ### PLAYBOOK DE ESTRATÉGIAS ###
         {playbook_estrategias}
+
+        ### BIBLIOTECA DE CASES DE SUCESSO ###
+        {cases_de_sucesso}
 
         ### DADOS DA NEGOCIAÇÃO ###
         - Objeção do Cliente: "{texto_da_objecao}"
@@ -101,14 +113,17 @@ def obter_resposta_da_ia():
         - Se o perfil for 'estabilidade' (S): Seja calmo, paciente e foque na segurança e na garantia do processo. Apresente um plano passo a passo. Evite pressão.
         - Se o perfil for 'conformidade' (C): Seja preciso, lógico e foque em dados, fatos e evidências. Apresente o processo de forma detalhada e responda a todas as perguntas com exatidão.
         - Se o perfil for 'nao_selecionado', use uma abordagem neutra e equilibrada.
-
+        
         Sempre utilize técnicas como o golden circle, PNL e Rapport para trazer uma resposta bem completa. Nunca deixe para depois para fazer o fechamento.
         Concentre em tentar quebrar as objeções para que a venda seja finalizada no momento da reunião e não 15 minutos ou dias depois.
         Evite perguntas muito fechadas que permitem responder sim ou não.
 
         ### TAREFA ###
-        Use TODOS os dados da negociação, ADAPTE o tom e os argumentos conforme o Perfil DISC do cliente de acordo com o que é esperado.
-        Gere a resposta no formato JSON com as chaves: "tipo_objecao", "roteiro", "tom_palavras_chave", "follow_up".
+        1.  Use os dados da negociação e o playbook para criar um roteiro.
+        2.  Selecione o case de sucesso MAIS RELEVANTE da biblioteca para fortalecer o argumento.
+        3.  Crie uma sugestão de ação de follow-up. A PRIMEIRA OPÇÃO deve ser sempre uma LIGAÇÃO ou uma resposta FALADA. Uma mensagem de WhatsApp só deve ser sugerida como último recurso.
+        4.  Gere o TEXTO COMPLETO para a mensagem de follow-up (e-mail ou WhatsApp), usando quebras de linha (\\n) para separar parágrafos.
+        5.  Gere a resposta no formato JSON com as chaves: "tipo_objecao", "roteiro", "tom_palavras_chave", "follow_up_sugerido" (string com a ação recomendada), e "mensagem_follow_up" (string com o texto completo).
 
         ### RESTRIÇÃO IMPORTANTE ###
         Sua resposta deve ser APENAS o código JSON, sem nenhum texto ou formatação adicional.
@@ -121,7 +136,7 @@ def obter_resposta_da_ia():
         
         json_da_resposta = json.loads(texto_limpo)
         
-        print("Roteiro personalizado (DISC) gerado pela IA com sucesso.")
+        print("Roteiro completo (com case e follow-up) gerado pela IA com sucesso.")
         return jsonify(json_da_resposta)
 
     except json.JSONDecodeError:

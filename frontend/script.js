@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 mediaRecorder.start();
                 isRecording = true;
 
-                recordButton.innerHTML = `<i class="ph ph-stop"></i><span>Parar</span>`; // Texto mais curto
+                recordButton.innerHTML = `<i class="ph ph-stop"></i>`;
                 recordButton.title = "Parar Gravação";
                 recordingIndicator.classList.remove('hidden');
                 objectionInput.value = "";
@@ -151,15 +151,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 tipo_objecao = "Não classificada", 
                 roteiro = ["Não foi possível gerar um roteiro."], 
                 tom_palavras_chave = { tom: "N/A", palavras_chave: [] }, 
-                follow_up = ["Nenhuma sugestão de follow-up."] 
+                follow_up_sugerido = "Nenhuma sugestão de follow-up.",
+                mensagem_follow_up = "Não foi possível gerar a mensagem de follow-up."
             } = dados || {};
 
             const roteiroArray = Array.isArray(roteiro) ? roteiro : [roteiro];
-            const followUpArray = Array.isArray(follow_up) ? follow_up : [follow_up];
             const palavrasChaveArray = Array.isArray(tom_palavras_chave.palavras_chave) ? tom_palavras_chave.palavras_chave : [];
 
             const roteiroHtml = roteiroArray.map(passo => `<li>${passo}</li>`).join('');
-            const followUpHtml = followUpArray.map(item => `<li>${item}</li>`).join('');
+            const mensagemFollowUpHtml = mensagem_follow_up.replace(/\n/g, '<br>');
 
             responseArea.innerHTML = `
                 <div class="response-card">
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="response-card">
                     <h3>
                         <i class="ph ph-microphone-stage"></i> Roteiro de Contorno Sugerido
-                        <button class="copy-button" id="copy-roteiro-btn" title="Copiar Roteiro"><i class="ph ph-copy"></i> Copiar</button>
+                        <button class="copy-button" data-copy-target="roteiro" title="Copiar Roteiro"><i class="ph ph-copy"></i> Copiar</button>
                     </h3>
                     <ul>${roteiroHtml}</ul>
                 </div>
@@ -179,19 +179,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     <strong>Palavras-Chave:</strong> ${palavrasChaveArray.join(', ') || 'N/A'}</p>
                 </div>
                 <div class="response-card">
-                    <h3><i class="ph ph-arrow-circle-right"></i> Sugestões de Follow-up</h3>
-                    <ul>${followUpHtml}</ul>
+                    <h3><i class="ph ph-arrow-circle-right"></i> Ação de Follow-up Sugerida</h3>
+                    <p>${follow_up_sugerido}</p>
+                </div>
+                <div class="response-card">
+                    <h3>
+                        <i class="ph ph-envelope"></i> Mensagem de Follow-up Pronta
+                        <button class="copy-button" data-copy-target="followup" title="Copiar Mensagem"><i class="ph ph-copy"></i> Copiar</button>
+                    </h3>
+                    <p class="follow-up-message">${mensagemFollowUpHtml}</p>
                 </div>
             `;
             
-            const copyButton = document.getElementById('copy-roteiro-btn');
-            copyButton.addEventListener('click', () => {
-                const textoParaCopiar = roteiroArray.join('\n');
-                navigator.clipboard.writeText(textoParaCopiar).then(() => {
-                    copyButton.innerHTML = '<i class="ph ph-check"></i> Copiado!';
-                    setTimeout(() => { copyButton.innerHTML = '<i class="ph ph-copy"></i> Copiar'; }, 2000);
+            document.querySelectorAll('.copy-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    let textoParaCopiar = "";
+                    const target = button.dataset.copyTarget;
+
+                    if (target === 'roteiro') {
+                        textoParaCopiar = roteiroArray.join('\n');
+                    } else if (target === 'followup') {
+                        textoParaCopiar = mensagem_follow_up;
+                    }
+
+                    navigator.clipboard.writeText(textoParaCopiar).then(() => {
+                        const originalText = button.innerHTML;
+                        button.innerHTML = '<i class="ph ph-check"></i> Copiado!';
+                        setTimeout(() => { button.innerHTML = originalText; }, 2000);
+                    });
                 });
             });
+
         } catch (erro) {
             console.error("Erro ao exibir a resposta:", erro);
             responseArea.innerHTML = `<p style="color: #ff4d4d;"><strong>Erro:</strong> Não foi possível processar a estrutura da resposta recebida.</p>`;

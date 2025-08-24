@@ -15,7 +15,7 @@
                 <defs>
                     <style>
                     .cls-1 {
-                        fill: #e6f1ff; /* Corrigido para combinar com o texto principal */
+                        fill: #e6f1ff;
                     }
                     </style>
                 </defs>
@@ -41,12 +41,13 @@
                     </g>
                 </g>
             </svg>
+            <!-- Título "CloserPro" removido -->
         </div>
         <p class="subtitulo">Receba roteiros inteligentes para contornar objeções em segundos.</p>
         
         <div class="input-group">
             <div class="input-group-header">
-                <label for="objection-input">1. Qual foi a objeção do cliente?</label>
+                <label for="objection-input"><i class="ph ph-chat-circle-dots"></i> 1. Qual foi a objeção do cliente?</label>
                 <div class="inline-buttons">
                     <button id="record-button" class="tertiary-button" title="Gravar Áudio">
                         <i class="ph ph-microphone"></i>
@@ -59,9 +60,8 @@
             <textarea id="objection-input" placeholder="Ex: 'Achei o valor um pouco alto...'"></textarea>
         </div>
 
-        <!-- NOVO CAMPO DE SELEÇÃO -->
         <div class="input-group">
-            <label for="disc-profile-select">2. Qual o perfil do cliente? (DISC)</label>
+            <label for="disc-profile-select"><i class="ph ph-user-focus"></i> 2. Qual o perfil do cliente? (DISC)</label>
             <select id="disc-profile-select">
                 <option value="nao_selecionado">Não selecionado</option>
                 <option value="dominancia">Dominância (D) - Direto, focado em resultados</option>
@@ -73,11 +73,11 @@
 
         <div class="context-fields">
             <div class="input-group">
-                <label for="value-input">3. Qual o valor da consultoria? (R$)</label>
+                <label for="value-input"><i class="ph ph-currency-dollar"></i> 3. Qual o valor da consultoria? (R$)</label>
                 <input type="number" id="value-input" placeholder="Ex: 5000">
             </div>
             <div class="input-group">
-                <label for="advantages-input">4. Quais vantagens o cliente já percebeu?</label>
+                <label for="advantages-input"><i class="ph ph-thumbs-up"></i> 4. Qual a principal vantagem?</label>
                 <input type="text" id="advantages-input" placeholder="Ex: Organização, impostos...">
             </div>
         </div>
@@ -94,7 +94,7 @@
             <span>Gravando...</span>
         </div>
 
-        <div id="response-area"></div>
+        <div class="text-justify" id="response-area"></div>
     </div>
 
     <footer class="footer">
