@@ -4,14 +4,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const objectionInput = document.getElementById('objection-input');
     const valueInput = document.getElementById('value-input');
     const advantagesInput = document.getElementById('advantages-input');
+    const discProfileSelect = document.getElementById('disc-profile-select');
     const responseArea = document.getElementById('response-area');
     const recordButton = document.getElementById('record-button');
     const recordingIndicator = document.getElementById('recording-indicator');
+    const clearButton = document.getElementById('clear-button');
 
     // Variáveis para controlar o estado da gravação
     let mediaRecorder;
     let audioChunks = [];
     let isRecording = false;
+
+    // --- LÓGICA DO BOTÃO LIMPAR ---
+    clearButton.addEventListener('click', () => {
+        objectionInput.value = '';
+        valueInput.value = '';
+        advantagesInput.value = '';
+        discProfileSelect.value = 'nao_selecionado';
+        responseArea.innerHTML = '';
+        objectionInput.focus();
+    });
 
     // --- LÓGICA DE GRAVAÇÃO DE ÁUDIO ---
     recordButton.addEventListener('click', async () => {
@@ -22,7 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 mediaRecorder.start();
                 isRecording = true;
 
-                recordButton.innerHTML = `<i class="ph ph-stop"></i><span>Parar Gravação</span>`;
+                recordButton.innerHTML = `<i class="ph ph-stop"></i><span>Parar</span>`; // Texto mais curto
+                recordButton.title = "Parar Gravação";
                 recordingIndicator.classList.remove('hidden');
                 objectionInput.value = "";
                 objectionInput.disabled = true;
@@ -46,7 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
             mediaRecorder.stop();
             isRecording = false;
             
-            recordButton.innerHTML = `<i class="ph ph-microphone"></i><span>Gravar Áudio</span>`;
+            recordButton.innerHTML = `<i class="ph ph-microphone"></i>`;
+            recordButton.title = "Gravar Áudio";
             recordingIndicator.classList.add('hidden');
             objectionInput.disabled = false;
         }
@@ -88,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const textoDaObjecao = objectionInput.value;
         const valorDaConsultoria = valueInput.value;
         const vantagensPercebidas = advantagesInput.value;
+        const perfilDisc = discProfileSelect.value;
 
         if (!textoDaObjecao.trim()) {
             alert('Por favor, preencha pelo menos a objeção do cliente.');
@@ -105,7 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ 
                     objection: textoDaObjecao,
                     value: valorDaConsultoria,
-                    advantages: vantagensPercebidas
+                    advantages: vantagensPercebidas,
+                    disc_profile: perfilDisc
                 }),
             });
 

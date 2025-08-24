@@ -75,30 +75,40 @@ def obter_resposta_da_ia():
         texto_da_objecao = dados_da_requisicao.get('objection', '')
         valor_consultoria = dados_da_requisicao.get('value', '')
         vantagens_percebidas = dados_da_requisicao.get('advantages', '')
+        perfil_disc = dados_da_requisicao.get('disc_profile', 'nao_selecionado')
 
         if not texto_da_objecao.strip():
             return jsonify({"error": "Nenhuma objeção foi fornecida"}), 400
 
-        print(f"Objeção recebida: '{texto_da_objecao}'")
-        print(f"Valor: R$ {valor_consultoria} | Vantagens: {vantagens_percebidas}")
+        print(f"Objeção: '{texto_da_objecao}', Valor: R$ {valor_consultoria}, Vantagens: '{vantagens_percebidas}', Perfil DISC: {perfil_disc}")
 
         prompt_para_ia = f"""
         ### CONTEXTO ###
-        Você é um líder da W1 Consultoria Financeira, especialista em treinar consultores financeiros. Sua missão é criar um roteiro eficaz para contornar uma objeção de fechamento de proposta de consultoria.
+        Você é um líder da W1 Consultoria Financeira, especialista em treinar consultores financeiros e mestre na metodologia DISC. Sua missão é criar um roteiro eficaz para contornar uma objeção de fechamento de proposta de consultoria.
 
         ### PLAYBOOK DE ESTRATÉGIAS ###
         {playbook_estrategias}
 
-        ### DADOS ESPECÍFICOS DA NEGOCIAÇÃO ###
+        ### DADOS DA NEGOCIAÇÃO ###
         - Objeção do Cliente: "{texto_da_objecao}"
         - Valor da Consultoria: "R$ {valor_consultoria}"
-        - Vantagens que o cliente já percebeu ou que foram apresentadas: "{vantagens_percebidas}"
+        - Vantagens Percebidas: "{vantagens_percebidas}"
+        - Perfil do Cliente (DISC): "{perfil_disc}"
+
+        ### INSTRUÇÕES DE COMUNICAÇÃO (DISC) ###
+        - Se o perfil for 'dominancia' (D): Seja direto, rápido e foque nos resultados e no ROI. Use frases curtas e poderosas. Evite detalhes excessivos.
+        - Se o perfil for 'influencia' (I): Seja otimista, amigável e foque em como a solução vai melhorar a vida dele e como outros clientes ficaram satisfeitos. Use prova social.
+        - Se o perfil for 'estabilidade' (S): Seja calmo, paciente e foque na segurança e na garantia do processo. Apresente um plano passo a passo. Evite pressão.
+        - Se o perfil for 'conformidade' (C): Seja preciso, lógico e foque em dados, fatos e evidências. Apresente o processo de forma detalhada e responda a todas as perguntas com exatidão.
+        - Se o perfil for 'nao_selecionado', use uma abordagem neutra e equilibrada.
+
+        Sempre utilize técnicas como o golden circle, PNL e Rapport para trazer uma resposta bem completa. Nunca deixe para depois para fazer o fechamento.
+        Concentre em tentar quebrar as objeções para que a venda seja finalizada no momento da reunião e não 15 minutos ou dias depois.
+        Evite perguntas muito fechadas que permitem responder sim ou não.
 
         ### TAREFA ###
-        Use TODOS os dados da negociação para criar uma resposta altamente personalizada.
-        - Se a objeção for sobre PREÇO, use o 'Valor da Consultoria' e as 'Vantagens' para construir um argumento de ROI (Retorno sobre Investimento) forte e específico. Transforme o valor de um 'custo' para um 'investimento' que se paga.
-        - Se a objeção for outra, use as 'Vantagens' para reforçar o valor e relembrar o cliente do que ele está buscando.
-        - Gere a resposta no formato JSON com as chaves: "tipo_objecao", "roteiro", "tom_palavras_chave", "follow_up".
+        Use TODOS os dados da negociação, ADAPTE o tom e os argumentos conforme o Perfil DISC do cliente de acordo com o que é esperado.
+        Gere a resposta no formato JSON com as chaves: "tipo_objecao", "roteiro", "tom_palavras_chave", "follow_up".
 
         ### RESTRIÇÃO IMPORTANTE ###
         Sua resposta deve ser APENAS o código JSON, sem nenhum texto ou formatação adicional.
@@ -111,7 +121,7 @@ def obter_resposta_da_ia():
         
         json_da_resposta = json.loads(texto_limpo)
         
-        print("Roteiro personalizado gerado pela IA com sucesso.")
+        print("Roteiro personalizado (DISC) gerado pela IA com sucesso.")
         return jsonify(json_da_resposta)
 
     except json.JSONDecodeError:
