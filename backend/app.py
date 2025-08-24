@@ -1,126 +1,126 @@
+# backend/app.py
+
 import os
 import json
+import magic
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 import google.generativeai as genai
 
-# --- Configuração Inicial ---
-
-# Carrega as variáveis de ambiente do arquivo .env (que contém nossa chave de API)
-# Isso permite manter a chave secreta e fora do código fonte.
+# --- Configuração Inicial da Aplicação ---
 load_dotenv()
 
-# Configura a API do Google Generative AI com a chave obtida do arquivo .env
-# O bloco try-except garante que a aplicação avise caso a chave não seja encontrada.
 try:
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
+    chave_de_api = os.getenv("GOOGLE_API_KEY")
+    if not chave_de_api:
         raise ValueError("A chave de API do Google não foi encontrada. Verifique seu arquivo .env")
-    genai.configure(api_key=api_key)
-except ValueError as e:
-    print(f"Erro Crítico: {e}")
-    exit() # Encerra a aplicação se a chave não estiver configurada
+    genai.configure(api_key=chave_de_api)
+except ValueError as erro:
+    print(f"Erro Crítico na Configuração: {erro}")
+    exit()
 
-# --- Inicialização da Aplicação Flask ---
+# --- Carregamento do Playbook de Vendas ---
+try:
+    with open("playbook.txt", "r", encoding="utf-8") as arquivo_playbook:
+        playbook_estrategias = arquivo_playbook.read()
+    print("Playbook de vendas carregado com sucesso.")
+except FileNotFoundError:
+    print("Erro Crítico: O arquivo 'playbook.txt' não foi encontrado.")
+    playbook_estrategias = "Nenhuma estratégia de playbook foi carregada."
 
-# Cria a instância principal da aplicação web
-app = Flask(__name__)
-# Habilita o CORS (Cross-Origin Resource Sharing) para permitir que o frontend
-# (rodando em um endereço diferente) possa fazer requisições para este backend.
-CORS(app)
+# --- Inicialização do Servidor Web Flask ---
+aplicacao = Flask(__name__)
+CORS(aplicacao)
 
 # --- Configuração do Modelo de Inteligência Artificial ---
+modelo_ia = genai.GenerativeModel('gemini-1.5-flash')
 
-# Seleciona e inicializa o modelo do Gemini que será utilizado.
-# 'gemini-1.5-flash' é uma excelente escolha por ser rápido e ter um bom custo-benefício.
-model = genai.GenerativeModel('gemini-1.5-flash')
-
-# --- Definição da Rota (Endpoint) da API ---
-
-# Define o endpoint '/api/get-response' que aceitará requisições do tipo POST.
-# É para este endereço que o nosso frontend enviará a objeção do cliente.
-@app.route('/api/get-response', methods=['POST'])
-def get_response():
-    """
-    Recebe uma objeção de cliente, envia para a IA do Gemini e retorna
-    uma resposta estruturada em formato JSON.
-    """
+# --- ROTA 1: TRANSCRIÇÃO DE ÁUDIO ---
+@aplicacao.route('/api/transcribe-audio', methods=['POST'])
+def transcrever_audio():
     try:
-        # 1. Recebe e valida os dados enviados pelo frontend
-        data = request.get_json()
-        objection_text = data.get('objection', '')
+        if 'audio' not in request.files:
+            return jsonify({"error": "Nenhum arquivo de áudio enviado"}), 400
 
-        # Se o texto da objeção estiver vazio, retorna um erro para o cliente.
-        if not objection_text.strip():
+        arquivo_de_audio = request.files['audio']
+        bytes_do_audio = arquivo_de_audio.read()
+        tipo_mime = magic.from_buffer(bytes_do_audio, mime=True)
+        
+        print(f"Arquivo de áudio recebido. Tipo: {tipo_mime}. Tamanho: {len(bytes_do_audio)} bytes.")
+        print("Enviando para a IA para transcrição...")
+
+        arquivo_gemini = genai.upload_file(path=bytes_do_audio, mime_type=tipo_mime)
+
+        resposta_ia = modelo_ia.generate_content([
+            "Transcreva o seguinte áudio em português do Brasil.", 
+            arquivo_gemini
+        ])
+
+        texto_transcrito = resposta_ia.text.strip()
+        print(f"Texto transcrito: '{texto_transcrito}'")
+
+        genai.delete_file(arquivo_gemini.name)
+        return jsonify({"transcription": texto_transcrito})
+
+    except Exception as erro:
+        print(f"Ocorreu um erro na transcrição: {erro}")
+        return jsonify({"error": "Não foi possível processar o arquivo de áudio."}), 500
+
+# --- ROTA 2: GERAÇÃO DE ROTEIRO A PARTIR DE TEXTO ---
+@aplicacao.route('/api/get-response', methods=['POST'])
+def obter_resposta_da_ia():
+    try:
+        dados_da_requisicao = request.get_json()
+        texto_da_objecao = dados_da_requisicao.get('objection', '')
+        valor_consultoria = dados_da_requisicao.get('value', '')
+        vantagens_percebidas = dados_da_requisicao.get('advantages', '')
+
+        if not texto_da_objecao.strip():
             return jsonify({"error": "Nenhuma objeção foi fornecida"}), 400
 
-        print(f"Objeção recebida do frontend: '{objection_text}'")
-        print("Enviando para a IA do Gemini para análise...")
+        print(f"Objeção recebida: '{texto_da_objecao}'")
+        print(f"Valor: R$ {valor_consultoria} | Vantagens: {vantagens_percebidas}")
 
-        # 2. Constrói o Prompt para o Gemini (Engenharia de Prompt)
-        # Esta é a parte mais importante. As instruções abaixo guiam a IA para
-        # gerar a resposta no formato e com a qualidade que desejamos.
-        
-        # No futuro, este playbook pode ser lido de um arquivo externo (ex: .txt ou .json)
-        # para facilitar atualizações sem alterar o código.
-        playbook_exemplo = """
-        - Objeção de Preço: O foco deve ser em VALOR e RETORNO, não em CUSTO. Use analogias de investimento. Apresente o ROI (retorno sobre o investimento) com exemplos concretos.
-        - Objeção de Timing ("Preciso de um tempo", "Vou pensar"): O objetivo é descobrir o receio por trás da procrastinação. Crie um senso de urgência mostrando o "custo da inação" (quanto o cliente perde por não agir agora).
-        - Objeção de Confiança ("Não sei se funciona para mim"): Use prova social (cases de sucesso, depoimentos de clientes com perfis similares). Ofereça uma pequena entrega de valor para demonstrar capacidade, como uma mini-análise gratuita.
-        - Objeção de Decisão em Conjunto ("Preciso falar com meu sócio/cônjuge"): Valide a importância da outra pessoa e se posicione como um aliado para ajudar a "vender a ideia" para o outro decisor. Sugira uma breve reunião a três.
-        """
-
-        prompt = f"""
+        prompt_para_ia = f"""
         ### CONTEXTO ###
-        Você é um coach de vendas sênior, especialista em treinar consultores financeiros de alta performance. Sua missão é criar um roteiro claro e eficaz para contornar uma objeção de cliente.
+        Você é um líder da W1 Consultoria Financeira, especialista em treinar consultores financeiros. Sua missão é criar um roteiro eficaz para contornar uma objeção de fechamento de proposta de consultoria.
 
         ### PLAYBOOK DE ESTRATÉGIAS ###
-        Use as seguintes estratégias como base para sua resposta:
-        {playbook_exemplo}
+        {playbook_estrategias}
 
-        ### OBJEÇÃO DO CLIENTE ###
-        A objeção que o consultor recebeu foi a seguinte: "{objection_text}"
+        ### DADOS ESPECÍFICOS DA NEGOCIAÇÃO ###
+        - Objeção do Cliente: "{texto_da_objecao}"
+        - Valor da Consultoria: "R$ {valor_consultoria}"
+        - Vantagens que o cliente já percebeu ou que foram apresentadas: "{vantagens_percebidas}"
 
         ### TAREFA ###
-        Gere uma resposta estritamente no formato JSON. O objeto JSON deve conter exatamente as seguintes chaves e tipos de dados:
-        1. "tipo_objecao": (string) Uma classificação da objeção (ex: "Preço", "Timing com toque de Confiança").
-        2. "roteiro": (lista de strings) Um passo a passo com 3 a 4 etapas claras para o consultor seguir.
-        3. "tom_palavras_chave": (objeto) Um objeto contendo duas chaves: "tom" (string descrevendo o tom de voz ideal) e "palavras_chave" (uma lista de strings com palavras recomendadas).
-        4. "follow_up": (lista de strings) Duas sugestões de próximos passos ou ações de acompanhamento.
+        Use TODOS os dados da negociação para criar uma resposta altamente personalizada.
+        - Se a objeção for sobre PREÇO, use o 'Valor da Consultoria' e as 'Vantagens' para construir um argumento de ROI (Retorno sobre Investimento) forte e específico. Transforme o valor de um 'custo' para um 'investimento' que se paga.
+        - Se a objeção for outra, use as 'Vantagens' para reforçar o valor e relembrar o cliente do que ele está buscando.
+        - Gere a resposta no formato JSON com as chaves: "tipo_objecao", "roteiro", "tom_palavras_chave", "follow_up".
 
         ### RESTRIÇÃO IMPORTANTE ###
-        Sua resposta deve ser APENAS o código JSON, sem nenhum texto, explicação ou formatação adicional como "```json" antes ou "```" depois.
+        Sua resposta deve ser APENAS o código JSON, sem nenhum texto ou formatação adicional.
         """
 
-        # 3. Envia o prompt para a API do Gemini e aguarda a resposta
-        response_ia = model.generate_content(prompt)
+        resposta_ia = modelo_ia.generate_content(prompt_para_ia)
         
-        # 4. Processa e formata a resposta da IA
-        # A resposta da IA vem em um formato de texto. Precisamos garantir que é um JSON válido.
-        response_text = response_ia.text.strip()
+        texto_da_resposta = resposta_ia.text
+        texto_limpo = texto_da_resposta.strip().replace('```json', '').replace('```', '')
         
-        # Converte a string de texto (que deve ser um JSON) em um dicionário Python
-        response_json = json.loads(response_text)
+        json_da_resposta = json.loads(texto_limpo)
         
-        print("Resposta gerada pela IA e processada com sucesso.")
-        
-        # 5. Envia a resposta final para o frontend
-        return jsonify(response_json)
+        print("Roteiro personalizado gerado pela IA com sucesso.")
+        return jsonify(json_da_resposta)
 
     except json.JSONDecodeError:
-        print(f"Erro: A IA retornou um formato que não é um JSON válido. Resposta recebida: {response_ia.text}")
-        return jsonify({"error": "A resposta da IA não pôde ser processada. Tente uma formulação diferente para a objeção."}), 500
-    except Exception as e:
-        # Captura qualquer outro erro que possa ocorrer durante o processo
-        print(f"Ocorreu um erro inesperado no servidor: {e}")
-        return jsonify({"error": "Ocorreu um erro interno no servidor. Por favor, tente novamente mais tarde."}), 500
+        print(f"Erro de Formato: A IA retornou um texto que não é um JSON válido. Resposta: {resposta_ia.text}")
+        return jsonify({"error": "A resposta da IA não pôde ser processada."}), 500
+    except Exception as erro:
+        print(f"Ocorreu um erro inesperado: {erro}")
+        return jsonify({"error": "Ocorreu um erro interno no servidor."}), 500
 
 # --- Execução da Aplicação ---
-
-# Este bloco verifica se o script está sendo executado diretamente (e não importado)
-# e inicia o servidor de desenvolvimento do Flask.
 if __name__ == '__main__':
-    # 'debug=True' faz com que o servidor reinicie automaticamente a cada alteração no código
-    # e fornece mais detalhes sobre erros.
-    app.run(debug=True, port=5000)
+    aplicacao.run(debug=True, port=5000)

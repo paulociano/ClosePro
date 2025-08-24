@@ -1,51 +1,111 @@
-/* Importa a fonte 'Inter' do Google Fonts para um visual mais moderno */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+/* Importa a fonte 'Poppins' do Google Fonts, que se alinha ao estilo da W1 */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-/* Define variáveis globais para cores e estilos, facilitando a manutenção */
+/* Define variáveis globais com a identidade visual da W1 (Dark Theme) */
 :root {
-    --cor-primaria: #0052cc; /* Azul profissional */
-    --cor-primaria-hover: #0041a3;
-    --cor-fundo: #f8f9fa; /* Fundo suave, quase branco */
-    --cor-superficie: #ffffff; /* Cor dos cards e container */
-    --cor-texto-principal: #212529; /* Preto suave para leitura */
-    --cor-texto-secundario: #6c757d; /* Cinza para textos de apoio */
-    --sombra: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --raio-borda: 8px;
+    --cor-destaque: #2ee5b5; /* Verde-água/Ciano vibrante da W1 */
+    --cor-destaque-hover: #29cfa3; /* Tom mais escuro para hover */
+    --cor-fundo: #0d1a26; /* Fundo azul-petróleo muito escuro */
+    --cor-superficie: #1d2d44; /* Superfície um pouco mais clara para o container */
+    --cor-texto-principal: #e6f1ff; /* Branco suave para textos principais */
+    --cor-texto-secundario: #a8b2d1; /* Cinza claro para textos de apoio */
+    --sombra: 0 10px 30px -15px rgba(2, 12, 27, 0.7);
+    --raio-borda: 6px;
 }
 
 /* Estilos base para o corpo da página */
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
     background-color: var(--cor-fundo);
     color: var(--cor-texto-principal);
     margin: 0;
     padding: 20px;
-    -webkit-font-smoothing: antialiased; /* Melhora a renderização da fonte */
+    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
 /* Container principal da aplicação */
 .container {
     max-width: 700px;
-    margin: 2rem auto; /* Espaçamento vertical e centralização horizontal */
+    margin: 2rem auto;
     background-color: var(--cor-superficie);
     padding: 40px;
     border-radius: var(--raio-borda);
     box-shadow: var(--sombra);
+    border: 1px solid #2a3a53;
+}
+
+/* Header com logo e título */
+.header-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.logo {
+    margin-bottom: 10px;
 }
 
 /* Título principal */
 h1 {
     color: var(--cor-texto-principal);
     text-align: center;
-    margin-bottom: 0.5rem;
+    font-weight: 600;
+    margin: 0;
 }
 
 /* Subtítulo de apoio */
 .subtitulo {
     text-align: center;
     color: var(--cor-texto-secundario);
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    font-size: 16px;
+}
+
+/* Grupo de input (label + campo) */
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--cor-texto-secundario);
+}
+
+/* Container para os campos de contexto lado a lado */
+.context-fields {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+.context-fields .input-group {
+    width: 50%;
+}
+
+/* Estilo para campos de texto e número */
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: var(--raio-borda);
+    border: 1px solid #3a4a63;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto-principal);
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    outline: none;
+    border-color: var(--cor-destaque);
+    box-shadow: 0 0 0 3px rgba(46, 229, 181, 0.2);
 }
 
 /* Área de texto para inserção da objeção */
@@ -54,72 +114,120 @@ textarea {
     height: 120px;
     padding: 15px;
     border-radius: var(--raio-borda);
-    border: 1px solid #ced4da;
+    border: 1px solid #3a4a63;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto-principal);
     font-size: 16px;
-    font-family: 'Inter', sans-serif;
-    margin-top: 10px;
-    box-sizing: border-box; /* Garante que padding não afete a largura total */
-    resize: vertical; /* Permite redimensionamento apenas vertical */
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+    resize: vertical;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Efeito de foco na área de texto */
 textarea:focus {
     outline: none;
-    border-color: var(--cor-primaria);
-    box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.2);
+    border-color: var(--cor-destaque);
+    box-shadow: 0 0 0 3px rgba(46, 229, 181, 0.2);
+}
+
+/* Container para os botões de ação */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
 }
 
 /* Botão principal de ação */
-button {
+#submit-button {
+    flex-grow: 1;
+    margin-top: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px; /* Espaço entre o ícone e o texto */
-    width: 100%;
+    gap: 10px;
     padding: 15px;
-    background-color: var(--cor-primaria);
-    color: white;
+    background-color: var(--cor-destaque);
+    color: #0d1a26;
     border: none;
     border-radius: var(--raio-borda);
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    margin-top: 15px;
     transition: background-color 0.3s, transform 0.1s;
 }
 
-/* Efeito ao passar o mouse sobre o botão */
-button:hover {
-    background-color: var(--cor-primaria-hover);
+#submit-button:hover {
+    background-color: var(--cor-destaque-hover);
     transform: translateY(-2px);
 }
 
-/* Estilo do botão quando desabilitado (durante o loading) */
-button:disabled {
-    background-color: #a9c7e8;
+#submit-button:disabled {
+    background-color: #29cfa3;
+    opacity: 0.6;
     cursor: not-allowed;
     transform: translateY(0);
 }
 
-/* Spinner de Carregamento */
-#loading-spinner {
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid #3498db;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    margin: 20px auto;
-    animation: spin 1s linear infinite;
+/* Estilo para o botão secundário (Gravar Áudio) */
+.secondary-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    background-color: transparent;
+    color: var(--cor-destaque);
+    border: 1px solid var(--cor-destaque);
+    border-radius: var(--raio-borda);
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s, transform 0.1s;
 }
 
-/* Animação de rotação para o spinner */
+.secondary-button:hover {
+    background-color: rgba(46, 229, 181, 0.1);
+    color: var(--cor-destaque-hover);
+    border-color: var(--cor-destaque-hover);
+    transform: translateY(-2px);
+}
+
+/* Indicador de Gravação */
+#recording-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    color: var(--cor-texto-secundario);
+    animation: fadeIn 0.3s;
+}
+
+/* CORREÇÃO DE BUG: Garante que o indicador de gravação fique oculto quando tem a classe .hidden */
+#recording-indicator.hidden {
+    display: none;
+}
+
+.recording-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #ff4d4d;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 77, 77, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
+}
+
+/* Animação de rotação para spinners */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
-/* Classe para animação de ícones de carregamento */
 .animate-spin {
     animation: spin 1s linear infinite;
 }
@@ -132,14 +240,14 @@ button:disabled {
 /* Área onde a resposta da IA é exibida */
 #response-area {
     margin-top: 30px;
-    border-top: 1px solid #eee;
-    padding-top: 20px;
+    border-top: 1px solid #2a3a53;
+    padding-top: 10px;
 }
 
 /* Estilo dos cards de resposta */
 .response-card {
-    background-color: var(--cor-fundo);
-    border: 1px solid #e9ecef;
+    background-color: transparent;
+    border: 1px solid #2a3a53;
     border-radius: var(--raio-borda);
     margin-top: 1.5rem;
     padding: 20px;
@@ -150,17 +258,18 @@ button:disabled {
 .response-card h3 {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-size: 1.1rem;
-    color: var(--cor-primaria);
+    font-weight: 600;
+    color: var(--cor-destaque);
     margin-top: 0;
     margin-bottom: 1rem;
 }
 
 /* Estilos para listas e parágrafos dentro dos cards */
 .response-card ul, .response-card p {
-    line-height: 1.6;
-    color: var(--cor-texto-principal);
+    line-height: 1.7;
+    color: var(--cor-texto-secundario);
 }
 
 .response-card ul {
@@ -169,12 +278,33 @@ button:disabled {
 
 /* Animação de surgimento suave para os cards */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilo para o botão de copiar */
+.copy-button {
+    background-color: rgba(46, 229, 181, 0.1);
+    color: var(--cor-destaque);
+    border: 1px solid var(--cor-destaque);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: auto;
+    transition: background-color 0.2s;
+}
+
+.copy-button:hover {
+    background-color: rgba(46, 229, 181, 0.2);
+}
+
+/* Estilo para o rodapé */
+.footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    color: var(--cor-texto-secundario);
+    font-size: 14px;
 }
