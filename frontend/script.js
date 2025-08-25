@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.disabled = true;
 
         try {
-            const resposta = await fetch('http://127.0.0.1:5000/api/transcribe-audio', {
+            const resposta = await fetch('https://closepro.onrender.com/api/transcribe-audio', {
                 method: 'POST',
                 body: formData,
             });
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         responseArea.innerHTML = '';
 
         try {
-            const resposta = await fetch('http://127.0.0.1:5000/api/get-response', {
+            const resposta = await fetch('https://closepro.onrender.com/api/get-response', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 

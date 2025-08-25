@@ -2,7 +2,7 @@
 
 import os
 import json
-import magic
+import filetype
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -45,7 +45,6 @@ CORS(aplicacao)
 # --- Configuração do Modelo de Inteligência Artificial ---
 modelo_ia = genai.GenerativeModel('gemini-1.5-flash')
 
-# --- ROTA 1: TRANSCRIÇÃO DE ÁUDIO ---
 @aplicacao.route('/api/transcribe-audio', methods=['POST'])
 def transcrever_audio():
     try:
@@ -54,7 +53,16 @@ def transcrever_audio():
 
         arquivo_de_audio = request.files['audio']
         bytes_do_audio = arquivo_de_audio.read()
-        tipo_mime = magic.from_buffer(bytes_do_audio, mime=True)
+        
+        # --- ALTERAÇÃO AQUI ---
+        # Usa a nova biblioteca 'filetype' para detetar o tipo do ficheiro
+        kind = filetype.guess(bytes_do_audio)
+        if kind is None:
+            print("Erro: Não foi possível determinar o tipo do ficheiro de áudio.")
+            return jsonify({"error": "Tipo de ficheiro de áudio não suportado."}), 400
+        
+        tipo_mime = kind.mime
+        # --- FIM DA ALTERAÇÃO ---
         
         print(f"Arquivo de áudio recebido. Tipo: {tipo_mime}. Tamanho: {len(bytes_do_audio)} bytes.")
         print("Enviando para a IA para transcrição...")
